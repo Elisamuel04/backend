@@ -56,11 +56,11 @@ router.post('/bulk', async (req, res) => {
       const status = item.status || 'todo';
 
       await client.query(
-        `INSERT INTO tasks (id, title, description, status)
-         VALUES ($1, $2, $3, $4)
+        `INSERT INTO tasks (id, title, description, status, priority)
+         VALUES ($1, $2, $3, $4, $5)
          ON CONFLICT (id)
-         DO UPDATE SET title = $2, description = $3, status = $4`,
-        [id, title, description, status]
+         DO UPDATE SET title = $2, description = $3, status = $4, priority = $5`,
+        [id, title, description, status, item.priority]
       );
     }
 
