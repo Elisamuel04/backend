@@ -1,9 +1,10 @@
 // server.js
 import express from 'express';
 import tasksRouter from './routes/tasks.js'; // tu archivo de rutas
-import pool from './db.js';
+import cors from 'cors';
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 
 app.use('/tasks', tasksRouter);
