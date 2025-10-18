@@ -1,15 +1,11 @@
+// server.js
 import express from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import tasksRoutes from './routes/tasks.js';
-
-dotenv.config();
+import tasksRouter from './routes/tasks.js'; // tu archivo de rutas
+import pool from './db.js';
 
 const app = express();
-app.use(cors());
 app.use(express.json());
 
-app.use('/tasks', tasksRoutes);
+app.use('/tasks', tasksRouter);
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`✅ Servidor escuchando en puerto ${PORT}`));
+app.listen(3000, () => console.log('Server running on port 3000'));
