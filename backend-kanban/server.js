@@ -3,6 +3,7 @@ import express from 'express';
 import tasksRouter from './routes/tasks.js'; // tu archivo de rutas
 import cors from 'cors';
 import dotenv from 'dotenv';
+import authRoutes from './routes/auth.js';
 
 
 dotenv.config();
