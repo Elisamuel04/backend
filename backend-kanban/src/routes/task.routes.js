@@ -4,10 +4,10 @@ import { verifyToken } from '../middleware/auth.middleware.js';
 
 const router = Router();
 
-router.get('/', getTasks);
-router.post('/', createTask);
-router.post('/bulk', saveTasksBulk);
-router.put('/:id', updateTask);
-router.delete('/:id', deleteTask);
+router.get('/', verifyToken, getTasks);
+router.post('/', verifyToken, createTask);
+router.post('/bulk', verifyToken, saveTasksBulk);
+router.put('/:id', verifyToken, updateTask);
+router.delete('/:id', verifyToken, deleteTask);
 
 export default router;
