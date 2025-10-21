@@ -1,29 +1,21 @@
-import { Router } from 'express';
-import pool from '../db.js';
+import { pool } from '../config/db.js';
 import { v4 as uuidv4 } from 'uuid';
 
-
-
-const router = Router();
-
-// ✅ GET /tasks - obtener todas las tareas
-router.get('/', async (req, res) => {
+// ✅ Obtener todas las tareas
+export const getTasks = async (req, res, next) => {
   try {
     const result = await pool.query('SELECT * FROM tasks ORDER BY "createdAt" DESC');
     res.json(result.rows);
   } catch (error) {
-    console.error('❌ Error en /tasks GET:', error);
-    res.status(500).json({ error: 'Error fetching tasks' });
+    next(error);
   }
-});
+};
 
-// ✅ POST /tasks - crear una sola tarea
-router.post('/', async (req, res) => {
+// ✅ Crear una sola tarea
+export const createTask = async (req, res, next) => {
   const { title, description, status } = req.body;
-
-  if (!title || title.length < 3) {
-    return res.status(400).json({ error: 'Title is required and must have at least 3 characters' });
-  }
+  if (!title || title.length < 3)
+    return res.status(400).json({ error: 'El título debe tener al menos 3 caracteres' });
 
   try {
     const newTask = await pool.query(
@@ -32,13 +24,12 @@ router.post('/', async (req, res) => {
     );
     res.status(201).json(newTask.rows[0]);
   } catch (error) {
-    console.error('❌ Error en /tasks POST:', error);
-    res.status(500).json({ error: 'Error creating task' });
+    next(error);
   }
-});
+};
 
-// ✅ POST /tasks/bulk - crear varias tareas
-router.post('/bulk', async (req, res) => {
+// ✅ Crear o actualizar varias tareas
+export const saveTasksBulk = async (req, res, next) => {
   const { items } = req.body;
 
   if (!Array.isArray(items) || items.length === 0) {
@@ -54,13 +45,14 @@ router.post('/bulk', async (req, res) => {
       const title = item.title || 'Sin título';
       const description = item.description || '';
       const status = item.status || 'todo';
+      const priority = item.priority || 0;
 
       await client.query(
         `INSERT INTO tasks (id, title, description, status, priority)
          VALUES ($1, $2, $3, $4, $5)
          ON CONFLICT (id)
-         DO UPDATE SET title = $2, description = $3, status = $4, priority = $5`,
-        [id, title, description, status, item.priority]
+         DO UPDATE SET title=$2, description=$3, status=$4, priority=$5`,
+        [id, title, description, status, priority]
       );
     }
 
@@ -69,44 +61,37 @@ router.post('/bulk', async (req, res) => {
 
     res.json({ message: '✅ Tareas guardadas correctamente', count: items.length });
   } catch (error) {
-    console.error('❌ Error en /tasks/bulk:', error);
-    res.status(500).json({ error: 'Error al guardar tareas' });
+    await client.query('ROLLBACK');
+    client.release();
+    next(error);
   }
-});
+};
 
-// ✅ PUT /tasks/:id - actualizar tarea
-router.put('/:id', async (req, res) => {
+// ✅ Actualizar una tarea
+export const updateTask = async (req, res, next) => {
   const { id } = req.params;
   const { title, description, status } = req.body;
-
-  if (title && title.length < 3) {
-    return res.status(400).json({ error: 'Title must have at least 3 characters' });
-  }
 
   try {
     const result = await pool.query(
       'UPDATE tasks SET title=$1, description=$2, status=$3 WHERE id=$4 RETURNING *',
       [title, description, status, id]
     );
-    if (result.rowCount === 0) return res.status(404).json({ error: 'Task not found' });
+    if (result.rowCount === 0) return res.status(404).json({ error: 'Tarea no encontrada' });
     res.json(result.rows[0]);
   } catch (error) {
-    console.error('❌ Error en /tasks PUT:', error);
-    res.status(500).json({ error: 'Error updating task' });
+    next(error);
   }
-});
+};
 
-// ✅ DELETE /tasks/:id - eliminar tarea
-router.delete('/:id', async (req, res) => {
+// ✅ Eliminar una tarea
+export const deleteTask = async (req, res, next) => {
   const { id } = req.params;
   try {
     const result = await pool.query('DELETE FROM tasks WHERE id=$1 RETURNING *', [id]);
-    if (result.rowCount === 0) return res.status(404).json({ error: 'Task not found' });
-    res.json({ message: 'Task deleted' });
+    if (result.rowCount === 0) return res.status(404).json({ error: 'Tarea no encontrada' });
+    res.json({ message: 'Tarea eliminada' });
   } catch (error) {
-    console.error('❌ Error en /tasks DELETE:', error);
-    res.status(500).json({ error: 'Error deleting task' });
+    next(error);
   }
-});
-
-export default router;
+};
