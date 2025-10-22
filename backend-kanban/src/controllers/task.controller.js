@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 // ✅ Obtener todas las tareas
 export const getTasks = async (req, res, next) => {
   try {
-    const result = await pool.query('SELECT * FROM tasks ORDER BY "created_at" DESC');
+    const result = await pool.query('SELECT * FROM tasks ORDER BY status, order_index ASC');
     res.json(result.rows);
   } catch (error) {
     next(error);
@@ -46,14 +46,15 @@ export const saveTasksBulk = async (req, res, next) => {
       const title = item.title || 'Sin título';
       const description = item.description || '';
       const status = item.status || 'todo';
-      const priority = item.priority || 0;
+      const priority = item.priority || 'Baja';
+      const order_index = item.order_index ?? index;
 
       await client.query(
-        `INSERT INTO tasks (id, title, description, status, priority)
-         VALUES ($1, $2, $3, $4, $5)
+        `INSERT INTO tasks (id, title, description, status, priority, order_index)
+         VALUES ($1, $2, $3, $4, $5, $6)
          ON CONFLICT (id)
-         DO UPDATE SET title=$2, description=$3, status=$4, priority=$5`,
-        [id, title, description, status, priority]
+         DO UPDATE SET title=$2, description=$3, status=$4, priority=$5, order_index=$6`,
+        [id, title, description, status, priority, order_index]
       );
     }
 

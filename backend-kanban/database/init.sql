@@ -12,5 +12,6 @@ CREATE TABLE IF NOT EXISTS tasks (
   status VARCHAR(50) DEFAULT 'todo',
   created_at TIMESTAMP DEFAULT NOW(),
   user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-  priority VARCHAR(10) DEFAULT 'Medium'
+  priority VARCHAR(10) DEFAULT 'Medium',
+  order_index INT DEFAULT 0
 );
