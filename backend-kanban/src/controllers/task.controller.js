@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 // ✅ Obtener todas las tareas
 export const getTasks = async (req, res, next) => {
   try {
-    const result = await pool.query('SELECT * FROM tasks ORDER BY "createdAt" DESC');
+    const result = await pool.query('SELECT * FROM tasks ORDER BY "created_at" DESC');
     res.json(result.rows);
   } catch (error) {
     next(error);
@@ -36,8 +36,9 @@ export const saveTasksBulk = async (req, res, next) => {
     return res.status(400).json({ error: 'No se recibieron tareas válidas' });
   }
 
+  let client;
   try {
-    const client = await pool.connect();
+    client = await pool.connect();
     await client.query('BEGIN');
 
     for (const item of items) {

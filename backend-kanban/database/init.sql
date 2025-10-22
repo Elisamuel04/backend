@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS tasks (
   title VARCHAR(255) NOT NULL,
   description TEXT,
   status VARCHAR(50) DEFAULT 'todo',
-  createdAt TIMESTAMP DEFAULT NOW(),
-  user_id UUID REFERENCES users(id) ON DELETE CASCADE
+  created_at TIMESTAMP DEFAULT NOW(),
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  priority VARCHAR(10) DEFAULT 'Medium'
 );
