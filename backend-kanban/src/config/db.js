@@ -12,5 +12,5 @@ export const pool = new Pool({
   port: parseInt(process.env.PGPORT, 10),
 });
 
-pool.on('connect', () => console.log('🟢 Connected to PostgreSQL'));
-pool.on('error', (err) => console.error('🔴 DB Error:', err));
+pool.on('connect', () => console.log('🟢 Conectado a PostgreSQL'));
+pool.on('error', (err) => console.error('🔴 Error en la DB:', err));
