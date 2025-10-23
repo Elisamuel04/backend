@@ -1,6 +1,14 @@
 # backend
 Backend en Nodejs MiniKanban proyecto de Elisamuel Valera para la prueba Tec. Dev Full Stack (Node.js + Angular)
 
+# Requeriments
+- npm 11.6.2
+- node v20.19.5
+- PosgreSQL 18 o inferior PORT: 5433 Password: samuel
+- jsonwebtoken 9.0.2 (npm install jsonwebtoken@9.0.2)
+- bcrypt@6.0.0 (npm install bcrypt@6.0.0)
+
+
 # Primero crear la base de datos (PSQL)
 CREATE DATABASE kanban_db;
 
